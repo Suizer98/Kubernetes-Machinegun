@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: machine-gun
+  namespace: machine-gun
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: machine-gun
+  template:
+    metadata:
+      labels:
+        app: machine-gun
+    spec:
+      containers:
+      - name: machine-gun
+        image: python:3.11-slim
+        command: ["/bin/bash"]
+        args: ["-c", "pip install aiohttp faker numpy pandas && sleep infinity"]
+        volumeMounts:
+        - name: machine-gun-script
+          mountPath: /app
+        workingDir: /app
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: machine-gun-script
+        configMap:
+          name: machine-gun-script
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: machine-gun-script
+  namespace: machine-gun
+data:
+  machine_gun.py: |
+    # Machine gun script content will be here
+    # This will be replaced with the actual script content
