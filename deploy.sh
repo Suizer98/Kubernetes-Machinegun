@@ -43,26 +43,33 @@ echo "Deploying Grafana..."
 kubectl apply -f k8s/monitoring.yaml
 kubectl apply -f k8s/grafana-dashboard-config.yaml
 
+# Deploy Machine Gun
+echo "Deploying Machine Gun..."
+kubectl apply -f k8s/machine-gun.yaml
+
 # Wait for services to be ready
 echo "Waiting for services to be ready..."
 kubectl wait --for=condition=ready pod -l app=fastapi -n machine-gun --timeout=60s
 kubectl wait --for=condition=ready pod -l app=nginx -n machine-gun --timeout=60s
 kubectl wait --for=condition=ready pod -l app=prometheus -n machine-gun --timeout=60s
 kubectl wait --for=condition=ready pod -l app=grafana -n machine-gun --timeout=60s
+kubectl wait --for=condition=ready pod -l app=machine-gun -n machine-gun --timeout=60s
 
 # Get service information
 echo "Getting service information..."
 kubectl get svc -n machine-gun
 
-echo "✅ Deployment complete!"
+echo "Deployment complete!"
 echo ""
-echo "🎯 Access URLs:"
-echo "Grafana Dashboard: minikube service grafana -n machine-gun"
-echo "Prometheus: minikube service prometheus -n machine-gun"
-echo "FastAPI: kubectl port-forward svc/nginx -n machine-gun 8080:80"
+echo "Setting up port forwarding..."
+kubectl port-forward svc/grafana -n machine-gun 3000:3000 &
+kubectl port-forward svc/nginx -n machine-gun 8080:80 &
+echo "   - Grafana: http://localhost:3000"
+echo "   - FastAPI: http://localhost:8080"
 echo ""
 echo "🔫 To start the machine gun:"
-echo "kubectl exec -it deployment/machine-gun -n machine-gun -- python machine_gun.py --attack=ddos --target=http://nginx --duration=60 --rps=100"
+echo "minikube kubectl -- exec -it deployment/machine-gun -n machine-gun -- \\"
+echo "  python3 machine_gun.py --attack=ddos --target=http://nginx --duration=60 --rps=1000"
 echo ""
 echo "📊 To check logs:"
 echo "kubectl logs -f deployment/fastapi -n machine-gun"

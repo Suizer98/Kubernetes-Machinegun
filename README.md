@@ -1,5 +1,7 @@
 # 🔫 Kubernetes Machine Gun
 
+[![Tech Stacks](https://skillicons.dev/icons?i=kubernetes,python,fastapi,nginx,prometheus,grafana,postgresql,redis,docker,git&theme=dark)](https://skillicons.dev)
+
 **Load testing platform for Kubernetes applications**
 
 **Machine Gun** → **Nginx** → **FastAPI** (3 replicas)  
